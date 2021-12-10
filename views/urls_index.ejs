@@ -14,20 +14,30 @@
     <h3>My URLs</h3>
     <table class="table">
       <thead>
-        <tr>
+        <tr> <!-- COLUMNS FOR TABLE-->
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Edit</th>
+          <th scope="col">Delete</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody> <!-- FOR EACH URL IN THE URLDATABASE-->
         <% for(let url in urls) { %>
           <tr>
-            <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><%= url %> </td> <!--PRINT THE SHORTURL -->
+            <td><%= urls[url] %> </td> <!-- PRINT THE LONGURL-->
+            <td> <!--CREATE THE EDIT & DELETE BUTTONS -->
+              <a class="btn btn-outline-primary" href="/urls/<%= url %>">Edit</a>
+            </td>
+            <td>
+              <form method="POST" action="/urls/<%= url %>/delete">
+              <button type="submit" class="deletebtn">Delete</button>
+            </form>
+           </td>
           </tr>
         <% } %>
       </tbody>
-    </table>
+    </table
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
