@@ -6,22 +6,26 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
+
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+      
       </div>
     </div>
+
     <div>
-      <% if (!username) { %>
-      <form class="login form-inline" action="/login" method="POST">
+      
+      <% if (!user) { %>
+
         <div>
-          <input class="loginform" type="text" name="username" style="width: 170px;" placeholder="Username">
-          <button type="submit" class="btn btn-primary">login</button>
-          </div>
-      </form>
+          <a class="loginheader" href="/login">Login</a>
+        <a class="registerheader" href="/register">Register</a>
+        </div>
+
       <% } else { %>
         <form class="logout form" action="/logout" method="post">
           <div>
-            Logged in as: <%= username %>
+            Logged in as: <%= user.email %>
             <button type="submit" class="logoutbtn">Logout</button> 
           </div>
         </form>
