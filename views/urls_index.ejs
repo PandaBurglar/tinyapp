@@ -9,9 +9,12 @@
   <title>TinyApp</title>
 </head>
 <body>
+
   <%- include('partials/_header') %>
+
   <main style="margin: 1em;">
     <h3>My URLs</h3>
+    <% if (user) { %> <!--Check to see if user is logged in-->
     <table class="table">
       <thead>
         <tr> <!-- COLUMNS FOR TABLE-->
@@ -25,9 +28,9 @@
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %> </td> <!--PRINT THE SHORTURL -->
-            <td><%= urls[url] %> </td> <!-- PRINT THE LONGURL-->
+            <td><%= urls[url].longURL %> </td> <!-- PRINT THE LONGURL-->
             <td> <!--CREATE THE EDIT & DELETE BUTTONS -->
-              <a class="btn btn-outline-primary" href="/urls/<%= url %>">Edit</a>
+              <a class="redirecttoEdit" href="/urls/<%= url %>">Edit</a>
             </td>
             <td>
               <form method="POST" action="/urls/<%= url %>/delete">
@@ -37,7 +40,10 @@
           </tr>
         <% } %>
       </tbody>
-    </table
+    </table>
+    <% } else { %>
+      <h4 class="loginfirst">Login or register to see your URLs.</h4>
+    <% } %>
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
