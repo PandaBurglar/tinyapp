@@ -31,12 +31,22 @@ const findUserEmailInDatabase = (email, database) => {
   return undefined;
 };
 
+// CHECK URLS FOR USER FUNCTION 
+const urlsForUser = (id) => {
+  let userUrlChecker = {};
+  // loop through urldatabase 
+  for (const shortURL in urlDatabase) {
+    // if the userID for the item thats being looped matched the given id parameter 
+    if (urlDatabase[shortURL].userID === id) {
+      userUrls[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return userUrlChecker;
+};
+
 
 // DATA
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
+const urlDatabase = {};
 
 //USER DATA 
 const users = {};
@@ -72,52 +82,76 @@ app.post('/register', (req, res) => {
 //BROWSE ROOT PATH -> REDIRECT TO HOME PAGE
 app.get("/", (req, res) => {
   res.send("Hello!");
-  res.redirect('/urls/');
+  res.redirect('/urls');
 });
 
 // HOME PAGE FOR TINYAPP
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: users[req.cookies['user_id']]};
+  const userId = req.cookies['user_id'];
+  const userUrls = urlsForUser(userId);
+  let templateVars = { urls: userUrls, user: users[userId] };
   res.render("urls_index", templateVars);
 });
 
 // CREATE NEW SHORT URL PAGE 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {user: users[req.cookies['user_id']]};
-  res.render("urls_new", templateVars);
+  // first check the cookies to see if the user_id exists
+  if (req.cookies['user_id']) {
+    // if it does you can render the new urls using their login
+    let templateVars = {user: users[req.cookies['user_id']]};
+    res.render('urls_new', templateVars);
+  } else {
+    // otherwise redirect them to login first 
+    res.redirect('/login');
+  }
 });
 
 // SHORTURL PAGE
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies['user_id']]};
-  res.render("urls_show", templateVars);
+  const userID = req.cookies['user_id'];
+  const userUrls = urlsForUser(userID);
+  let templateVars = { urls: userUrls, user: users[userID], shortURL: req.params.shortURL };
+  res.render('urls_show', templateVars);
 });
 
 // REDIRECT SHORTURL TO ITS LONGURL PAGE
 app.get("/urls/:shortURL", (req, res) => {
-  const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-  res.redirect(longURL.longURL);
+  if (longURL) {
+    res.redirect(longURL);
+  } else {
+    res.statusCode = 404;
+    res.send('<h2>404 Not Found<br>This short URL does not exist.</h2>')
+  }
 });
 
 // CREATE A SHORTURL USING POST 
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: req.cookies['user_id']
+  };
   res.redirect('/urls/'+ shortURL);
 });
 
-// EDIT THE LONGURL FOR SELECTED SHORTURL IN THE DATABASE
+// UPDATE THE LONGURL FOR SELECTED SHORTURL IN THE DATABASE
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.updatedURL;
+  // check if current url belonds to the current user and then allow edit 
+  if (req.cookies['user_id'] === urlDatabase[shortURL].userID) {
+    urlDatabase[shortURL].longURL = req.body.updatedURL;
+  }
   res.redirect(`/urls/${shortURL}`);
 });
 
 // DELETE SHORTURL USING POST 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
-  delete  urlDatabase[shortURL];
+  // check if current url belonds to the current user and then delete
+  if (req.cookies['user_id'] === urlDatabase[shortURL].userID) {
+    delete urlDatabase[shortURL];
+  }
   res.redirect('/urls/');
 });
 
