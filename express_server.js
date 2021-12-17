@@ -170,7 +170,7 @@ app.post('/register', (req, res) => {
   // REGISTRATION ERRORS
   if (req.body.email && req.body.password) {
     // once they input the email & password check to see if email exists
-    if (!getUserByEmail(req.body.email), users) {
+    if (!getUserByEmail(req.body.email, users)) {
       // if not, generate a new id with their email & password
       const userID = generateRandomString();
       users[userID] = {
